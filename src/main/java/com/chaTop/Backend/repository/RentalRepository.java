@@ -1,4 +1,7 @@
 package com.chaTop.Backend.repository;
 
-public interface RentalRepository {
+import com.chaTop.Backend.model.Rental;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface RentalRepository extends JpaRepository<Rental, Long> {
 }
