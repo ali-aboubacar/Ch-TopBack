@@ -31,9 +31,9 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "users")
+    @OneToMany(mappedBy = "id")
     private Set<Rental> rentals = new HashSet<>();
-    @OneToMany(mappedBy = "users")
+    @OneToMany(mappedBy = "id")
     private Set<Message> messages = new HashSet<>();
     public User() {
 

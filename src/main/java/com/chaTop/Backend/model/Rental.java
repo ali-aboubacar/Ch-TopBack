@@ -32,7 +32,7 @@ public class Rental {
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User user;
-    @OneToMany(mappedBy = "rentals")
+    @OneToMany(mappedBy = "id")
     private Set<Message> messages = new HashSet<>();
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

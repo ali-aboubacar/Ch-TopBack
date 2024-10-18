@@ -1,7 +1,8 @@
 package com.chaTop.Backend.model;
 
 import jakarta.persistence.*;
-
+@Entity
+@Table(name = "messages")
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -13,7 +14,7 @@ public class Message {
     @JoinColumn(name = "user_id")
     private User user;
     @ManyToOne
-    @JoinColumn(name = "rental_id_id")
+    @JoinColumn(name = "rental_id")
     private Rental rental;
 
     public Message(){
