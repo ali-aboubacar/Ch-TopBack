@@ -7,11 +7,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = "name"),
+                @UniqueConstraint(columnNames = "email")
+        })
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(name = "email")
@@ -35,6 +39,12 @@ public class User {
     private Set<Rental> rentals = new HashSet<>();
     @OneToMany(mappedBy = "id")
     private Set<Message> messages = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(  name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
     public User() {
 
     }
@@ -49,6 +59,9 @@ public class User {
         return id;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
     public String getEmail() {
         return email;
     }
@@ -72,9 +85,26 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+    public Set<Rental> getRentals() {
+        return rentals;
+    }
 
-    @Override
-    public String toString() {
-        return "User [id=" + id + ", email=" + email + ", name=" + name + ", password=" + password + "]";
+    public void setRentals(Set<Rental> rentals) {
+        this.rentals = rentals;
+    }
+
+    public Set<Message> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(Set<Message> messages) {
+        this.messages = messages;
+    }
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 }

@@ -5,6 +5,7 @@ import com.chaTop.Backend.service.RentalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ public class RentalController {
     RentalService rentalService;
 
     @GetMapping("/rentals")
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<List<Rental>> getAllRentals(){
         try {
             List<Rental> rentals = new ArrayList<Rental>();
@@ -30,6 +32,7 @@ public class RentalController {
     }
 
     @GetMapping("/rentals/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<Rental> getRentalById(@PathVariable("id") long id){
         try {
             Optional<Rental> rental = rentalService.getRentalById(id);
@@ -41,6 +44,7 @@ public class RentalController {
     }
 
     @PostMapping("/rentals")
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<Rental> createRental(@RequestBody Rental rental){
         try {
             return new ResponseEntity<>(rentalService.createRental(rental), HttpStatus.CREATED);
@@ -50,6 +54,7 @@ public class RentalController {
     }
 
     @PutMapping("/rentals/{id}")
+    @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<Rental> updateRental(@PathVariable("id") long id, @RequestBody Rental rental){
         try {
             Optional<Rental> rentalData = rentalService.getRentalById(id);
@@ -65,6 +70,7 @@ public class RentalController {
     }
 
     @DeleteMapping("/rentals/{id}")
+    @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> deleteRental(@PathVariable("id") long id){
         try {
             rentalService.deleteRental(id);
