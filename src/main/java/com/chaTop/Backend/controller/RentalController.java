@@ -7,7 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.text.html.HTML;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -45,9 +47,13 @@ public class RentalController {
 
     @PostMapping("/rentals")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-    public ResponseEntity<Rental> createRental(@RequestBody Rental rental){
+    public ResponseEntity<Rental> createRental( @RequestParam("name") String name,
+                                                @RequestParam("surface") int surface,
+                                                @RequestParam("price") double price,
+                                                @RequestParam("picture") MultipartFile picture,
+                                                @RequestParam("description") String description ){
         try {
-            return new ResponseEntity<>(rentalService.createRental(rental), HttpStatus.CREATED);
+            return new ResponseEntity<>(rentalService.createRental(name, surface, price, picture, description), HttpStatus.CREATED);
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }

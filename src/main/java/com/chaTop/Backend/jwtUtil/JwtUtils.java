@@ -28,6 +28,13 @@ public class JwtUtils {
         try{
             UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
 
+            logger.info("generating token", Jwts.builder()
+                    .setSubject((userPrincipal.getEmail()))
+                    .setIssuedAt(new Date())
+                    .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                    .signWith(key(), SignatureAlgorithm.HS256)
+                    .compact());
+
             return Jwts.builder()
                     .setSubject((userPrincipal.getEmail()))
                     .setIssuedAt(new Date())
@@ -60,6 +67,7 @@ public class JwtUtils {
     public boolean validateJwtToken(String authToken) {
         try {
             Jwts.parserBuilder().setSigningKey(key()).build().parse(authToken);
+            logger.info("token jwt",Jwts.parserBuilder().setSigningKey(key()).build().parse(authToken));
             return true;
         } catch (MalformedJwtException e) {
             logger.error("Invalid JWT token: {}", e.getMessage());

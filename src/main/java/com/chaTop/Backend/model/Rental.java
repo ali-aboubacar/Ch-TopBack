@@ -22,12 +22,12 @@ public class Rental {
     private Integer surface;
 
     @Column(name = "price")
-    private Integer price;
+    private double price;
 
     @Column(name = "picture")
     private String picture;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
     @ManyToOne
     @JoinColumn(name = "owner_id")
@@ -45,12 +45,13 @@ public class Rental {
 
     }
 
-    public Rental(String name, Integer surface, Integer price, String picture, String description) {
+    public Rental(String name, Integer surface, double price, String picture, String description, User user) {
         this.name = name;
         this.surface = surface;
         this.price = price;
         this.picture = picture;
         this.description = description;
+        this.user = user;
     }
 
     public long getId() {
@@ -86,11 +87,11 @@ public class Rental {
     public void setSurface(Integer email) {
         this.surface = surface;
     }
-    public Integer getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(Integer price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 
