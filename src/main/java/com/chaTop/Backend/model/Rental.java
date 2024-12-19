@@ -1,10 +1,12 @@
 package com.chaTop.Backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -25,13 +27,14 @@ public class Rental {
     private double price;
 
     @Column(name = "picture")
-    private String picture;
+    private List<String> picture;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
+
     @ManyToOne
-    @JoinColumn(name = "owner_id")
-    private User user;
+    @JoinColumn(name = "user_id")
+    private User owner;
     @OneToMany(mappedBy = "id")
     private Set<Message> messages = new HashSet<>();
     @CreationTimestamp
@@ -45,17 +48,29 @@ public class Rental {
 
     }
 
-    public Rental(String name, Integer surface, double price, String picture, String description, User user) {
+    public Rental(String name, Integer surface, double price, List<String> picture, String description, User user) {
         this.name = name;
         this.surface = surface;
         this.price = price;
         this.picture = picture;
         this.description = description;
-        this.user = user;
+        this.owner = user;
     }
 
     public long getId() {
         return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public User getOwner(){
+        return this.owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 
     public String getName() {
@@ -73,18 +88,18 @@ public class Rental {
     public void setDescription(String description) {
         this.description = description;
     }
-    public String getPicture() {
+    public List<String> getPicture() {
         return picture;
     }
 
-    public void setPicture(String picture) {
+    public void setPicture(List<String> picture) {
         this.picture = picture;
     }
     public Integer getSurface() {
         return surface;
     }
 
-    public void setSurface(Integer email) {
+    public void setSurface(Integer surface) {
         this.surface = surface;
     }
     public double getPrice() {
@@ -95,8 +110,23 @@ public class Rental {
         this.price = price;
     }
 
-    @Override
-    public String toString() {
-        return "Rental [id=" + id + ", name=" + name + ", surface=" + surface + ", description=" + description + ", price-"+ price +"]";
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Set<Message> getMessages() {
+        return messages;
     }
 }

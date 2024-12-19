@@ -16,6 +16,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+
+import java.util.List;
 
 @Configuration
 @EnableMethodSecurity
@@ -53,14 +56,21 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/auth/**").permitAll()
-//                                .requestMatchers("/api/rentals/**").permitAll()
-                                .anyRequest().authenticated()
-                );
+        http.cors(cors -> cors.configurationSource(request -> {
+            var corsConfig = new CorsConfiguration();
+            corsConfig.setAllowedOrigins(List.of("http://localhost:4200", "127.0.0.1:4200"));
+            corsConfig.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
+            corsConfig.setAllowedHeaders(List.of("*"));
+            corsConfig.setAllowCredentials(true);
+            return corsConfig;
+                }))
+            .csrf(csrf -> csrf.disable())
+            .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth ->
+                    auth.requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/uploads/**").permitAll()
+                            .anyRequest().authenticated()
+            );
 
         http.authenticationProvider(authenticationProvider());
 

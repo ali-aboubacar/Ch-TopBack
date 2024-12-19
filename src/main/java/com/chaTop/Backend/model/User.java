@@ -35,7 +35,7 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "id")
+    @OneToMany(mappedBy = "owner")
     private Set<Rental> rentals = new HashSet<>();
     @OneToMany(mappedBy = "id")
     private Set<Message> messages = new HashSet<>();
@@ -106,5 +106,13 @@ public class User {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 }

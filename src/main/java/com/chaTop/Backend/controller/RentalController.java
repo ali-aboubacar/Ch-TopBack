@@ -1,7 +1,16 @@
 package com.chaTop.Backend.controller;
 
+import com.chaTop.Backend.dtos.RentalDto;
+import com.chaTop.Backend.mapper.RentalMapper;
 import com.chaTop.Backend.model.Rental;
+import com.chaTop.Backend.payload.response.RentalsResponse;
 import com.chaTop.Backend.service.RentalService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,35 +18,67 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.text.html.HTML;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+/**
+ * Controller pour gerer les rentals via des endpoints REST.
+ */
+@Tag(name = "Rental", description = "Rental management APIs")
 @RestController
 @RequestMapping("/api")
 public class RentalController {
     @Autowired
     RentalService rentalService;
 
+    @Autowired
+    RentalMapper rentalMapper;
+    /**
+     * Recuperer tout les rentals disponible dans le systeme.
+     * @return Un RentalResponse
+     */
+    @Operation(
+            summary = "Recuperation de tous les rentals",
+            description = "Get a list of rental.",
+            tags = { "rentals", "get" })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Rental.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
     @GetMapping("/rentals")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-    public ResponseEntity<List<Rental>> getAllRentals(){
+    public ResponseEntity<RentalsResponse> getAllRentals(){
         try {
-            List<Rental> rentals = new ArrayList<Rental>();
-            rentals = rentalService.getAllRentals();
-
+            List<RentalDto> rentalsList = new ArrayList<>();
+            rentalsList = rentalService.getAllRentals();
+            RentalsResponse rentals = new RentalsResponse();
+            rentals.setRentals(rentalsList);
             return new ResponseEntity<>(rentals, HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    /**
+     * Recupere le rental qui correspond a l'id fournie.
+     * @param id l'id du rental
+     * @return Un rental.
+     */
+    @Operation(
+            summary = "Recuperation d'un rental par Id",
+            description = "Get a Rental object by specifying its id. The response is Rental object.",
+            tags = { "rentals", "get" })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Rental.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
     @GetMapping("/rentals/{id}")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-    public ResponseEntity<Rental> getRentalById(@PathVariable("id") long id){
+    public ResponseEntity<RentalDto> getRentalById(@PathVariable("id") long id){
         try {
-            Optional<Rental> rental = rentalService.getRentalById(id);
+            Optional<RentalDto> rental = rentalService.getRentalById(id);
             return rental.map(value -> new ResponseEntity(value, HttpStatus.OK))
                          .orElseGet(() -> new ResponseEntity(HttpStatus.NOT_FOUND));
         } catch (Exception e) {
@@ -45,27 +86,58 @@ public class RentalController {
         }
     }
 
+    /**
+     * Creation du rental dans le systeme
+     * @param name nom saisi par l'utilisateur
+     * @param surface surface saisie par l'utilisateur
+     * @param price prix saisi par l'utilisateur
+     * @param picture image choisie par l'utilisateur
+     * @param description description saisie par l'utilisateur
+     * @return un rental
+     */
+    @Operation(
+            summary = "Creation d'un rental",
+            description = ".",
+            tags = { "rentals", "post" })
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", content = { @Content(schema = @Schema(implementation = Rental.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
     @PostMapping("/rentals")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-    public ResponseEntity<Rental> createRental( @RequestParam("name") String name,
+    public ResponseEntity<RentalDto> createRental( @RequestParam("name") String name,
                                                 @RequestParam("surface") int surface,
                                                 @RequestParam("price") double price,
                                                 @RequestParam("picture") MultipartFile picture,
                                                 @RequestParam("description") String description ){
         try {
-            return new ResponseEntity<>(rentalService.createRental(name, surface, price, picture, description), HttpStatus.CREATED);
+            return new ResponseEntity<RentalDto>(rentalService.createRental(name, surface, price, picture, description), HttpStatus.CREATED);
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+
+    /**
+     * Modifier un rental.
+     * @param id l'identifiant du rental a modifier
+     * @param
+     * @return un rental
+     */
+    @Operation(
+            summary = "Retrieve a Rental by Id",
+            description = "Get a Rental object by specifying its id. The response is Rental object.",
+            tags = { "rentals", "put" })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Rental.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
     @PutMapping("/rentals/{id}")
-    @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
-    public ResponseEntity<Rental> updateRental(@PathVariable("id") long id, @RequestBody Rental rental){
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+    public ResponseEntity<RentalDto> updateRental(@PathVariable("id") long id, @RequestParam String name, @RequestParam Integer surface, @RequestParam Integer price , @RequestParam String description){
         try {
-            Optional<Rental> rentalData = rentalService.getRentalById(id);
+            Optional<RentalDto> rentalData = rentalService.getRentalById(id);
             if (rentalData.isPresent()){
-                Rental updatedRental = rentalService.updateRental(rentalData.get(), rental);
+                RentalDto updatedRental = rentalService.updateRental(rentalData.get(), name, surface, price, description);
                 return new ResponseEntity<>(updatedRental, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -75,6 +147,19 @@ public class RentalController {
         }
     }
 
+    /**
+     * Supprime le rental qui correspond a l'id fournie.
+     * @param id l'id du rental
+     * @return HttpStatus
+     */
+    @Operation(
+            summary = "Retrieve a Rental by Id",
+            description = "Get a Rental object by specifying its id. The response is Rental object.",
+            tags = { "rentals", "delete" })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Rental.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
     @DeleteMapping("/rentals/{id}")
     @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> deleteRental(@PathVariable("id") long id){

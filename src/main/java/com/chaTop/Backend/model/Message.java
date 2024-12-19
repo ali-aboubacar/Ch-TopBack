@@ -21,8 +21,11 @@ public class Message {
 
     }
 
-    public Message(String message){
+    public Message(String message, User user, Rental rental){
         this.message = message;
+        this.user = user;
+        this.rental = rental;
+
     }
 
     public long getId() {
