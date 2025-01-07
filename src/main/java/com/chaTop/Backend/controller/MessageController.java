@@ -3,6 +3,7 @@ package com.chaTop.Backend.controller;
 import com.chaTop.Backend.model.Message;
 import com.chaTop.Backend.model.Rental;
 import com.chaTop.Backend.payload.request.MessageRequest;
+import com.chaTop.Backend.payload.response.MessageResponse;
 import com.chaTop.Backend.service.MessageService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,9 +49,10 @@ public class MessageController {
      */
     @PostMapping("/messages")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-    public ResponseEntity<Message> createMessage(@RequestBody MessageRequest message){
+    public ResponseEntity<MessageResponse> createMessage(@RequestBody MessageRequest message){
         try {
-            return new ResponseEntity<>(messageService.createMessage(message), HttpStatus.CREATED);
+            messageService.createMessage(message);
+            return new ResponseEntity<MessageResponse>(new MessageResponse("Message send with success"), HttpStatus.CREATED);
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }

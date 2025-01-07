@@ -3,6 +3,7 @@ package com.chaTop.Backend.controller;
 import com.chaTop.Backend.dtos.RentalDto;
 import com.chaTop.Backend.mapper.RentalMapper;
 import com.chaTop.Backend.model.Rental;
+import com.chaTop.Backend.payload.response.MessageResponse;
 import com.chaTop.Backend.payload.response.RentalsResponse;
 import com.chaTop.Backend.service.RentalService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Controller pour gerer les rentals via des endpoints REST.
@@ -33,8 +33,6 @@ public class RentalController {
     @Autowired
     RentalService rentalService;
 
-    @Autowired
-    RentalMapper rentalMapper;
     /**
      * Recuperer tout les rentals disponible dans le systeme.
      * @return Un RentalResponse
@@ -104,13 +102,14 @@ public class RentalController {
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
     @PostMapping("/rentals")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-    public ResponseEntity<RentalDto> createRental( @RequestParam("name") String name,
+    public ResponseEntity<MessageResponse> createRental( @RequestParam("name") String name,
                                                 @RequestParam("surface") int surface,
                                                 @RequestParam("price") double price,
                                                 @RequestParam("picture") MultipartFile picture,
                                                 @RequestParam("description") String description ){
         try {
-            return new ResponseEntity<RentalDto>(rentalService.createRental(name, surface, price, picture, description), HttpStatus.CREATED);
+            rentalService.createRental(name, surface, price, picture, description);
+            return new ResponseEntity<MessageResponse>(new MessageResponse("Rental created !"), HttpStatus.CREATED);
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -133,12 +132,12 @@ public class RentalController {
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
     @PutMapping("/rentals/{id}")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-    public ResponseEntity<RentalDto> updateRental(@PathVariable("id") long id, @RequestParam String name, @RequestParam Integer surface, @RequestParam Integer price , @RequestParam String description){
+    public ResponseEntity<MessageResponse> updateRental(@PathVariable("id") long id, @RequestParam String name, @RequestParam Integer surface, @RequestParam Integer price , @RequestParam String description){
         try {
             Optional<RentalDto> rentalData = rentalService.getRentalById(id);
             if (rentalData.isPresent()){
-                RentalDto updatedRental = rentalService.updateRental(rentalData.get(), name, surface, price, description);
-                return new ResponseEntity<>(updatedRental, HttpStatus.OK);
+                rentalService.updateRental(rentalData.get(), name, surface, price, description);
+                return new ResponseEntity<MessageResponse>(new MessageResponse("Rental updated !"), HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }

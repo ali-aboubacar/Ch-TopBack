@@ -17,6 +17,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -123,6 +124,7 @@ public class RentalService {
             if (description != null) initialRental.setDescription(description);
             if (price > 0) initialRental.setPrice(price);
             if (surface > 0) initialRental.setSurface(surface);
+            initialRental.setUpdated_at(LocalDate.now().toString());
             Rental updatedRental = rentalMapper.toRental(initialRental);
             Rental savedRental = rentalRepository.save(updatedRental);
             return rentalMapper.toRentalDto(savedRental);

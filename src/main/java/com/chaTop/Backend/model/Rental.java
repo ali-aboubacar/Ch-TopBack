@@ -39,11 +39,11 @@ public class Rental {
     private Set<Message> messages = new HashSet<>();
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     @CreationTimestamp
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private String updatedAt;
     public Rental() {
 
     }
@@ -110,19 +110,19 @@ public class Rental {
         this.price = price;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public String getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
     }
 
